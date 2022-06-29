@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta name="Whitelips: Online Esoteric Programming Language IDE and Optimizing Compiler" content="Whitelips is an IDE for esoteric programming languages. It is based on the Whitespace programing language but can be extended to interpret and compile other languages such as Brainfuck. Whitelips features an interpreter and an optimizing compiler for Whitespace." />
+    <meta name="generator"
+          content="HTML Tidy for Linux/x86 (vers 25 March 2009), see www.w3.org">
+    <style type="text/css">
+@import "css/ws_ide.css";
+@import "css/ws_debug.css";
+    </style>
+    <script type="text/javascript"
+          src="jquery.js">
+</script>
+    <script type="text/javascript"
+          src="interceptTabs.js">
+</script>
+    <script type="text/javascript"
+          src="ws_util.js">
+</script>
+    <script type="text/javascript"
+          src="ws_fs.js">
+</script>
+    <script type="text/javascript"
+          src="ws_ide.js">
+</script>
+    <script type="text/javascript"
+          src="ws_core.js">
+</script>
+    <script type="text/javascript"
+          src="ws_asm.js">
+</script>
+     <script type="text/javascript"
+          src="ws_opt.js">
+</script>
+   <title>Whitelips the Esoteric Language IDE</title>
+  </head>
+  <body>
+    </div>
+    <div id="panels">
+      <div id="panelLeft"
+           class="panel">
+        <div id="panelLeftLabel"
+             class="label">
+          <span>Files</span>
+        </div>
+        <div class="buttonBar">
+          <span class="btn"><a href="javascript:void(0);"
+               onclick="return ws_ide.newFile();">[New]</a></span>
+           <span class="btn localStorageButton"><a href="javascript:void(0);"
+               onclick="return ws_ide.deleteFile();">[Delete]</a></span>
+            <span class="btn localStorageButton"><a href="javascript:void(0);"
+               onclick="return ws_ide.saveFile();">[Save]</a></span>
+        </div>
+        <div class="content">
+          <div id="fileList">
+         </div>
+        </div>
+      </div>
+      <div id="panelMiddle"
+           class="panel">
+        <div id="panelMiddleLabel"
+             class="label">
+          <span>noname.ws</span>
+        </div>
+        <div class="content">
+          <div id="buttonDiv">
+            <span class="btn" id="btnRun"><a href="javascript:void(0);" onclick="ws_ide.runProgram();">[Run ]</a></span> 
+            <span class="btn" id="btnStop" style="display:none"><a href="javascript:void(0);"  onclick="ws_ide.stopProgram();">[Stop]</a></span>
+            <span class="btn" id="btnCompile"><a href="javascript:void(0);" onclick="ws_ide.compileAsm();">[Compile]</a></span> 
+            <span class="btn" id="btnOptimize"><a href="javascript:void(0);" onclick="ws_ide.optimizeProgram();">[Optimize]</a></span> 
+            <span class="btn" id="btnEnableHighlight"  style="display:none"><a href="javascript:void(0);" onclick="ws_ide.setHighlight(true);">[ ]Highlight</a></span> 
+            <span class="btn" id="btnDisableHighlight" style="display: none;"><a href="javascript:void(0);"  onclick="ws_ide.setHighlight(false);">[X]Highlight</a></span>
+            <span class="btn" id="btnDownload"><a href="javascript:void(0);" onclick="ws_ide.downloadFile();">[Download]</a></span> 
+            <div style="display:inline-block;">
+              <span class="btn" id="btnHelp"><a href="javascript:void(0);" onclick="ws_ide.displayHelp();">[ HELP ]</a></span> 
+            </div>
+          </div>
+          <div id="scrollableSource" class="scrollable">
+            <div id="inputContainer"
+                 class="inputContainer">
+              <textarea id="srcInput"
+                   class="inputArea inputBox">
+You really need to enable javascript or sth!
+</textarea>
+              <div id="srcOverlay"
+                   class="inputArea inputOverlay"></div>
+            </div>
+          </div>
+          <div id="srcHiddenDiv"
+               class="inputArea"
+               style="display: none;"></div>
+          <div id="errorDiv">&nbsp;</div>
+          <div id="animDiv">&nbsp;</div>
+          <div class="outputTabs">
+            <div class="tabLabels">
+              <div id="tabLabelPrint" class="btn">
+                <a href="#printTab"
+                     onclick="return ws_ide.switchTab(this);">Input/Output</a>
+              </div>
+              <div id="tabLabelConsole" class="btn">
+                <a href="#consoleTab"
+                     onclick="return ws_ide.switchTab(this);">Console</a>
+              </div>
+              <div class="btn">
+                <a href="#memoryTab"
+                     onclick="return ws_ide.switchTab(this);">Memory</a>
+              </div>
+              <div class="btn">
+                  <a href="#aboutTab"
+                     onclick="return ws_ide.switchTab(this);">About</a>
+              </div>
+            </div>
+            <div class="allTabs">
+              <div id="printTab"
+                   class="tabContent">
+                <div class="buttonBar">
+                  <span class="btn"><a href="javascript:void(0);"
+                     onclick="return ws_ide.clearPrintArea('#printArea');">[Clear]</a></span>
+                  <span class="btn"><a href="javascript:void(0);"
+                     onclick="return ws_ide.handleUserInput('#userInput', null);">[EOF]</a></span>
+                </div>
+                <div class="outputArea"
+                     onclick="ws_ide.focusUserInput('#userInput')">
+                  <div id="printArea"
+                       class="outputText">
+                    <span></span>
+                    <form onsubmit="return ws_ide.handleUserInput('#userInput');" autocomplete="off">
+                      <input type="text"
+                            id="userInput"
+                            class="userInput" style="height:13px">
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div id="consoleTab"
+                   class="tabContent">
+                <div class="buttonBar">
+                  <span class="btn"><a href="javascript:void(0);"
+                     onclick="return ws_ide.clearPrintArea('#consoleArea');">[Clear]</a></span>
+                </div>
+                <div id="consoleArea"
+                     class="outputArea consoleText"></div>
+              </div>
+              <div id="memoryTab"
+                   class="tabContent">
+                <div class="buttonBar">
+                </div>
+                <div id="memoryArea" class="outputArea">
+                  <div>
+                    <span>Stack: </span>
+                    <span id="stackSpan"></span>
+                  </div>
+                  <div>
+                    <span>Heap: </span>
+                    <span id="heapSpan"></span>
+                  </div>
+                </div>
+              </div>
+              <div id="aboutTab"
+                     class="tabContent">
+                    <div class="buttonBar">
+                    </div>
+                    <div id="aboutArea"
+                         class="outputArea"></div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="panelRight"
+           class="panel">
+        <div id="panelRightLabel"
+             class="label">
+          <span>Debug</span>
+        </div>
+        <div class="buttonBar">
+          <span class="btn" id="btnDebugRunProgram"><a href="javascript:void(0);"  onclick="ws_ide.runProgram(true);">[Run]</a></span>
+          <span class="btn" id="btnDebugStepProgram"><a href="javascript:void(0);"  onclick="ws_ide.stepProgram();">[Step]</a></span>
+          <span class="btn" id="btnDebugStopProgram"><a href="javascript:void(0);"  onclick="ws_ide.stopProgram();">[Stop]</a></span>
+        </div>
+        <div class="content">
+          <div id="disasm">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display: none" id="fog" class="modalFog" onClick="ws_ide.hideModal();"></div>
+      <div id="modal">
+       <div id="splashScreenModal" class="modalContent" onClick="ws_ide.hideModal();">
+         <div class="nameVersion">
+Whitelips IDE
+for esoteric languages
+
+      ver 0.13.1</div>
+         <div>
+          Source: <a href="https://github.com/vii5ard/whitespace" target="_blank" >https://github.com/vii5ard/whitespace</a>
+         </div>
+      </div>
+      <div id="helpModal" class="modalContent">
+        <div class="buttonBar">
+          <span class="btn"><a href="javascript:void(0);" onClick="ws_ide.hideModal();">[Close]</a></span>
+          <span class="btn"><a href="help.html" target="_blank" onClick="ws_ide.hideModal();">[Open in new window]</a></span>
+        </div>
+        <div id="helpModalContent"></div>
+      </div>
+  </body>
+</html>

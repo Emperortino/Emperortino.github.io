@@ -1,0 +1,178 @@
+# Math library
+
+# Macro definitons
+macro pow:  call pow $$
+macro abs:  call abs $$
+macro max:  call max $$
+macro min:  call min $$
+macro sign: call sign $$
+macro gcd:  call gcd $$
+macro lcm:  call lcm $$
+macro sqrt: call sqrt $$
+
+macro neg: push -1 mul $$
+macro shr: push 2 div $$ # no speed advantage,
+macro shl: push 2 mul $$ # but just for fun
+
+# Actual code
+
+end
+
+# Power function
+pow:
+  push 1
+_pow_loop:
+  copy 1
+  jn _pow_neg
+  copy 1 
+  jz _pow_end
+  copy 2
+  mul
+  swap
+  push 1
+  sub
+  swap
+  jmp _pow_loop
+_pow_neg:
+  drop
+  push 0
+_pow_end:
+  slide 2
+  ret
+
+# Absolute value function
+abs:
+  dup
+  jn _abs_neg
+  jmp _abs_end
+_abs_neg:
+  push -1
+  mul
+_abs_end:
+  ret
+
+# Max value of two topmost stack elements
+max:
+  dup
+  copy 2
+  sub
+  jn _max_second
+  slide 1 
+  jmp _max_end
+_max_second:
+  drop
+_max_end:
+  ret
+
+# Min value of two topmost stack elements
+min:
+  dup
+  copy 2
+  sub
+  jn _min_second
+  drop 
+  jmp _min_end
+_min_second:
+  slide 1
+_min_end:
+  ret
+
+# Sign function
+sign:
+  dup
+  jz _sign_0
+  jn _sign_neg
+  push 1
+  jmp _sign_end
+_sign_0:
+  push 0
+  jmp _sign_end
+_sign_neg:
+  push -1
+_sign_end:
+  ret
+
+# Greatest common divisor
+gcd:
+  dup
+  jz _gcd_end
+  swap
+  copy 1
+  mod
+  jmp gcd
+_gcd_end:
+  drop
+  ret
+
+# Least common multiple
+lcm:
+  dup
+  copy 2 
+  mul
+  abs
+  copy 1
+  copy 3 
+  gcd
+  div
+  slide 2
+  ret
+
+# Floor value of the square root
+sqrt:
+  dup
+  jz .sqrt_01
+  dup
+  push 1
+  sub
+  jz .sqrt_01
+  jmp .sqrt_gt1
+.sqrt_01:
+  ret
+.sqrt_gt1:
+  push 0
+  copy 1
+.sqrt:
+  dup
+  copy 2
+  sub
+  dup
+  mul
+  push 1
+  sub
+  jz .sqrt_floor_result
+  dup
+  copy 2
+  add
+  push 2
+  div
+  dup
+  dup
+  mul
+  copy 4
+  swap
+  sub
+  dup
+  jz .sqrt_result
+  jn .sqrt_ceil
+  drop
+  swap
+  copy 1
+  add
+  push 2
+  div
+  swap
+  jmp .sqrt_continue
+.sqrt_ceil:
+  slide 1
+  jmp .sqrt
+.sqrt_continue:
+  jmp .sqrt
+.sqrt_result:
+  drop
+  slide 3
+  ret
+.sqrt_floor_result:
+  drop
+  slide 1
+  ret
+

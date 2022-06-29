@@ -1,0 +1,178 @@
+include "lib/std.wsa"
+
+  push 0            ; first unused jz label
+
+  push 0
+  push 0
+  store
+
+  prints "push 0\n" ; current pointer
+  nl;
+
+  ; Read the initial value
+  readc 0
+main_loop:
+  retrieve 0
+
+  jz end_loop
+
+  ; Test for increment and decrement
+  retrieve 0
+  push '+' 
+  sub
+  jz read_inc_dec
+  
+  retrieve 0
+  push '-'
+  sub
+  jz read_inc_dec
+
+  retrieve 0
+  push '['
+  sub
+  jz inc_labels
+
+  retrieve 0
+  push ']'
+  sub
+  jz end_label
+
+  retrieve 0
+  push '>'
+  sub
+  jz inc_pointer
+
+  retrieve 0
+  push '<'
+  sub
+  jz dec_pointer
+
+  retrieve 0
+  push '.'
+  sub
+  jz pointer_print
+
+  retrieve 0
+  push ','
+  sub
+  jz pointer_read
+
+continue_loop:
+  push 0
+  dup
+  store
+
+  readc 0
+
+  jmp main_loop
+
+end_loop:
+  prints "end\n"
+  end
+
+inc_pointer:
+  prints "; >\n"
+  prints "  push 1\n"
+  prints "  add\n"
+  jmp continue_loop
+
+dec_pointer:
+  prints "; <\n"
+  prints "  push -1\n"
+  prints "  add\n"
+  jmp continue_loop
+
+pointer_print:
+  prints "; .\n"
+  prints "  dup\n"
+  prints "  retrieve\n"
+  prints "  printc\n"
+  jmp continue_loop
+
+pointer_read:
+  prints "; ,\n"
+  prints "  dup\n"
+  prints "  readc\n"
+  jmp continue_loop
+
+inc_labels:
+  prints "; [\n"
+  dup
+  dup
+  dup
+  prints "begin_"
+  printi
+  prints ":\n"
+
+  prints "  dup\n"
+  prints "  retrieve\n"
+  prints "  jz end_"
+  printi nl
+  add 1
+
+  jmp continue_loop
+
+end_label:
+  prints "; ]\n"
+  swap
+  dup
+  prints "  jmp begin_"
+  printi nl
+  prints "end_"
+  printi
+  prints ":\n"
+
+  jump continue_loop
+
+read_inc_dec:
+  push 0
+  prints "; "
+rid_loop:
+  retrieve 0
+  push '+'
+  sub
+  jz inc_top
+
+  retrieve 0
+  push '-'
+  sub
+  jz dec_top
+
+  ; Check for other control symbols and ignore comment
+  retrieve 0 push 0 sub jz rid_end
+  retrieve 0 push '.' sub jz rid_end
+  retrieve 0 push ',' sub jz rid_end
+  retrieve 0 push '<' sub jz rid_end
+  retrieve 0 push '>' sub jz rid_end
+  retrieve 0 push '[' sub jz rid_end
+  retrieve 0 push ']' sub jz rid_end
+
+rid_continue:
+  push 0
+  dup
+  store
+
+  readc 0
+  jmp rid_loop
+rid_end:
+  nl
+  prints "  dup\n"
+  prints "  dup\n"
+  prints "  retrieve\n"
+  prints "  push "
+  printi nl
+  prints "  add\n"
+  prints "  store\n"
+
+  jmp main_loop;
+
+inc_top:
+  prints "+"
+  add 1
+  jmp rid_continue
+
+dec_top:
+  prints "-"
+  sub 1
+  jmp rid_continue
+  
