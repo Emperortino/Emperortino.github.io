@@ -340,8 +340,18 @@ globalThis.ws = {
     this.getAsm = asmWithNoParam;
   },
 
+  // WsDropTop: function() {
+  //   this.run = function (env) {
+  //     env.register.SP--;
+  //     env.register.IP++;
+  //   }
+  //   this.getAsm = asmWithNoParam;
+  // },
+
   WsDropTop: function() {
     this.run = function (env) {
+      env.print(env.stackPeek()); /* 输出栈 数据 */  /* 接受一个指定的 Unicode 值，然后返回一个字符串。 */
+      env.print(",")
       env.register.SP--;
       env.register.IP++;
     }
@@ -460,14 +470,24 @@ globalThis.ws = {
     this.getAsm = asmWithNoParam;
   },
 
-  WsPrintChar: function() {
+  WsPrintChar: function() { /* 编译后 输出 */
     this.run = function(env) {
-      const ch = env.stackPop();
+      const ch = env.stackPop(); /* 出栈 */
       env.print(String.fromCharCode(Number(ch & 0xffffffffn)));
       env.register.IP++;
     };
     this.getAsm = asmWithNoParam;
   },
+
+  // WsPrintChar2: function() {
+  //   this.run = function(env) {
+  //     var ch = env.stackPop();
+  //     env.print(ch);
+  //     env.print(",");
+  //     env.register.IP++;
+  //   };
+  //   this.getAsm = asmWithNoParam;
+  // },
 
   WsCall: function() {
     this.run = function (env) {
